@@ -30,17 +30,16 @@ if [ ! -e $CONTAINER_ALREADY_STARTED ]; then
     touch $CONTAINER_ALREADY_STARTED
     echo "-- First container startup --"
 
-    cd /zeppelin/conf
+    sudo cd /zeppelin/conf
 
-    csplit interpreter.json /influxdb/
-    mv interpreter.json interpreter.json.old
+    sudo csplit interpreter.json /influxdb/
+    sudo mv interpreter.json interpreter.json.old
 
-    sed -i -e "s|###ORACLE_CONNECT###|$ORACLE_CONNECT|g" interpreter_osql.json
-    sed -i -e "s|###ORACLE_USER###|$ORACLE_USER|g" interpreter_osql.json
-    sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" interpreter_osql.json
+    sudo sed -i -e "s|###ORACLE_CONNECT###|$ORACLE_CONNECT|g" interpreter_osql.json
+    sudo sed -i -e "s|###ORACLE_USER###|$ORACLE_USER|g" interpreter_osql.json
+    sudo sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" interpreter_osql.json
 
-    cat xx00 interpreter_osql.json xx01 > interpreter.json
+    sudo cat xx00 interpreter_osql.json xx01 > interpreter.json
+    sudo cd ..:x
 fi
-
-cd /
 /zeppelin/bin/zeppelin.sh
