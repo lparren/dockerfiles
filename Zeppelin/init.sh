@@ -1,11 +1,10 @@
 #!/bin/bash
 # LICENSE UPL 1.0
 #
-# Copyright (c) 1982-2018 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011 TheDOC. All rights reserved.
 #
 # Since: November, 2016
-# Author: gerald.venzl@oracle.com
-# Description: Runs the Oracle Database inside the container
+# Author: l.parren@thedoc.nl
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
@@ -30,16 +29,9 @@ if [ ! -e $CONTAINER_ALREADY_STARTED ]; then
     touch $CONTAINER_ALREADY_STARTED
     echo "-- First container startup --"
 
-    sudo cd /zeppelin/conf
-
-    sudo csplit interpreter.json /influxdb/
-    sudo mv interpreter.json interpreter.json.old
-
-    sudo sed -i -e "s|###ORACLE_CONNECT###|$ORACLE_CONNECT|g" interpreter_osql.json
-    sudo sed -i -e "s|###ORACLE_USER###|$ORACLE_USER|g" interpreter_osql.json
-    sudo sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" interpreter_osql.json
-
-    sudo cat xx00 interpreter_osql.json xx01 > interpreter.json
-    sudo cd ..:x
+    sed -i -e "s|###ORACLE_CONNECT###|$ORACLE_CONNECT|g" /zeppelin/conf/interpreter_osql.json
+    sed -i -e "s|###ORACLE_USER###|$ORACLE_USER|g" /zeppelin/conf/interpreter_osql.json
+    sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" /zeppelin/conf/interpreter_osql.json
 fi
+
 /zeppelin/bin/zeppelin.sh

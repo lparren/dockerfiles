@@ -4,7 +4,7 @@ ENV RUN_FILE="init.sh" \
     INSTALL_DIR=/opt/install
 
 COPY ojdbc8.jar /zeppelin/interpreter/jdbc/
-COPY interpreter_osql.json /zeppelin/conf/
+COPY interpreter.json /zeppelin/conf/
 COPY $RUN_FILE $INSTALL_DIR/
 
 USER root
