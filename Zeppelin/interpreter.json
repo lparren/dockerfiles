@@ -2937,7 +2937,7 @@
         "owners": [],
         "isUserImpersonate": false
       }
-    },    
+    },
     "osql": {
       "id": "osql",
       "name": "osql",
@@ -3061,7 +3061,7 @@
       ],
       "dependencies": [
         {
-          "groupArtifactVersion": "/zeppelin/interpreter/jdbc/ojdbc8.jar",
+          "groupArtifactVersion": "/opt/oracle/instantclient_21_1/ojdbc8.jar",
           "local": false
         }
       ],
