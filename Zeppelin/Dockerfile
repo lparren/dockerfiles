@@ -1,83 +1,56 @@
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+FROM apache/zeppelin:0.9.0
 
-FROM zeppelin-distribution:latest AS zeppelin-distribution
+ENV RUN_FILE="init.sh"  \
+    INSTALL_DIR=/opt/install \
+    PATH="$PATH:/opt/oracle/instantclient_21_1" \
+    LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/oracle/instantclient_21_1"
 
-# Prepare all interpreter settings for Zeppelin server
-# This steps are not needed, if you you add only specific interpreters settings to your image
-FROM alpine:3.11 AS interpreter-settings
-COPY --from=zeppelin-distribution /opt/zeppelin/interpreter /tmp/interpreter
-RUN mkdir -p /opt/zeppelin/interpreter && \
-    cd /tmp/interpreter && \
-    find . -name 'interpreter-setting.json' -exec cp --parents \{\} /opt/zeppelin/interpreter \;
+COPY interpreter.json /zeppelin/conf/
+COPY $RUN_FILE $INSTALL_DIR/
+COPY instantclient*.zip  /opt/oracle/
+COPY ore-supporting-linux-x86-64-1.5.1.zip ore-client-linux-x86-64-1.5.1.zip $INSTALL_DIR/
 
-FROM ubuntu:20.04
-LABEL maintainer="Apache Software Foundation <dev@zeppelin.apache.org>"
+USER root
 
-RUN set -ex && \
-    apt-get -y update && \
-    # Install language and other base packages
-    DEBIAN_FRONTEND=noninteractive apt-get install -y language-pack-en openjdk-8-jre-headless tini wget && \
-    # Cleanup
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get autoclean && \
-    apt-get clean
+# Update packages, the update R to 3.6.1
+# update all R packages
+# install oracle client and Oracle R Enterprise (ORE) packages
+RUN apt-get update -y  && \
+    apt-get install -y apt-transport-https  && \
+    add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran35/'   && \
+    apt-get update -y  && \
+    apt-get install -y r-base  && \
+    apt-get install -y r-base-dev  && \
+    chmod ug+x $INSTALL_DIR/*.sh  && \
+    cd /opt/oracle && \
+    unzip instantclient-basic-linux.x64-21.1.0.0.0.zip && \
+    unzip instantclient-sqlplus-linux.x64-21.1.0.0.0.zip && \
+    cd /opt/install && \
+    unzip ore-client-linux-x86-64-1.5.1.zip && \
+    unzip ore-supporting-linux-x86-64-1.5.1.zip && \
+    R -e "install.packages('devtools', repos = 'http://cran.us.r-project.org')" && \
+    R -e "install.packages('knitr', repos = 'http://cran.us.r-project.org')" && \
+    R -e "install.packages('ggplot2', repos = 'http://cran.us.r-project.org')" && \
+    R -e "install.packages(c('devtools','mplot', 'googleVis'), repos = 'http://cran.us.r-project.org'); require(devtools); install_github('ramnathv/rCharts')" && \
+    R -e 'update.packages(ask = FALSE)' && \
+    R CMD INSTALL /opt/install/client/ORE_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz                && \
+    R CMD INSTALL /opt/install/client/OREbase_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz            && \
+    R CMD INSTALL /opt/install/client/OREcommon_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz          && \
+    R CMD INSTALL /opt/install/client/OREdm_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz              && \
+    R CMD INSTALL /opt/install/client/OREdplyr_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz           && \
+    R CMD INSTALL /opt/install/client/OREeda_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz             && \
+    R CMD INSTALL /opt/install/client/OREembed_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz           && \
+    R CMD INSTALL /opt/install/client/OREgraphics_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz        && \
+    R CMD INSTALL /opt/install/client/OREmodels_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz          && \
+    R CMD INSTALL /opt/install/client/OREpredict_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz         && \
+    R CMD INSTALL /opt/install/client/OREstats_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz           && \
+    R CMD INSTALL /opt/install/client/ORExml_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz             && \
+    R CMD INSTALL /opt/install/supporting/Cairo_1.5-9_R_x86_64-unknown-linux-gnu.tar.gz          && \
+    R CMD INSTALL /opt/install/supporting/DBI_0.6-1_R_x86_64-unknown-linux-gnu.tar.gz            && \
+    R CMD INSTALL /opt/install/supporting/ROracle_1.3-2_R_x86_64-unknown-linux-gnu.tar.gz        && \
+    R CMD INSTALL /opt/install/supporting/arules_1.5-0_R_x86_64-unknown-linux-gnu.tar.gz         && \
+    R CMD INSTALL /opt/install/supporting/png_0.1-7_R_x86_64-unknown-linux-gnu.tar.gz            && \
+    R CMD INSTALL /opt/install/supporting/randomForest_4.6-12_R_x86_64-unknown-linux-gnu.tar.gz  && \
+    R CMD INSTALL /opt/install/supporting/statmod_1.4.29_R_x86_64-unknown-linux-gnu.tar.gz
 
-ARG version="0.9.0-SNAPSHOT"
-
-ENV LANG=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8 \
-    JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 \
-    VERSION="${version}" \
-    Z_HOME="/opt/zeppelin" \
-    ZEPPELIN_ADDR="0.0.0.0" \
-    ZEPPELIN_WAR_TEMPDIR="/tmp/webapps"
-
-# Copy Zeppelin related files
-COPY --from=zeppelin-distribution /opt/zeppelin/zeppelin-web-${VERSION}.war ${Z_HOME}/
-COPY --from=zeppelin-distribution /opt/zeppelin/zeppelin-web-angular-${VERSION}.war ${Z_HOME}/
-COPY --from=zeppelin-distribution /opt/zeppelin/conf ${Z_HOME}/conf
-COPY --from=zeppelin-distribution /opt/zeppelin/bin ${Z_HOME}/bin
-COPY --from=zeppelin-distribution /opt/zeppelin/lib ${Z_HOME}/lib
-COPY --from=zeppelin-distribution /opt/zeppelin/plugins ${Z_HOME}/plugins
-COPY --from=zeppelin-distribution /opt/zeppelin/interpreter/zeppelin-interpreter-shaded-${VERSION}.jar ${Z_HOME}/interpreter/zeppelin-interpreter-shaded-${VERSION}.jar
-# copy example notebooks
-COPY --from=zeppelin-distribution /opt/zeppelin/notebook ${Z_HOME}/notebook
-# copy k8s files
-COPY --from=zeppelin-distribution /opt/zeppelin/k8s ${Z_HOME}/k8s
-
-# Decide
-## 1) Copy and activate all interpreters (default)
-COPY --from=interpreter-settings /opt/zeppelin/interpreter ${Z_HOME}/interpreter
-## 2) Copy and activate only a specific set of interpreter
-# COPY --from=zeppelin-distribution /opt/zeppelin/interpreter/spark/interpreter-setting.json ${Z_HOME}/interpreter/spark/interpreter-setting.json
-# COPY --from=zeppelin-distribution /opt/zeppelin/interpreter/jdbc/interpreter-setting.json ${Z_HOME}/interpreter/jdbc/interpreter-setting.json
-# COPY --from=zeppelin-distribution /opt/zeppelin/interpreter/md/interpreter-setting.json ${Z_HOME}/interpreter/md/interpreter-setting.json
-
-COPY log4j.properties ${Z_HOME}/conf/
-
-RUN mkdir -p "${Z_HOME}/logs" "${Z_HOME}/run" "${Z_HOME}/notebook" "${Z_HOME}/local-repo" && \
-     # Allow process to edit /etc/passwd, to create a user entry for zeppelin
-    chgrp root /etc/passwd && chmod ug+rw /etc/passwd && \
-    # Give access to some specific folders
-    chmod -R 775 "${Z_HOME}/logs" "${Z_HOME}/run" "${Z_HOME}/conf" "${Z_HOME}/notebook" "${Z_HOME}/local-repo"
-
-USER 1000
-
-EXPOSE 8080
-
-ENTRYPOINT [ "/usr/bin/tini", "--" ]
-WORKDIR ${Z_HOME}
-CMD ["bin/zeppelin.sh"]
+CMD exec $INSTALL_DIR/$RUN_FILE
