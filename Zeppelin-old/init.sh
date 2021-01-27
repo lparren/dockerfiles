@@ -34,4 +34,4 @@ if [ ! -e $CONTAINER_ALREADY_STARTED ]; then
     sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" /zeppelin/conf/interpreter.json
 fi
 
-/opt/zeppelin/bin/zeppelin.sh
+/zeppelin/bin/zeppelin.sh

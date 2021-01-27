@@ -10,7 +10,7 @@ RUN yum install -y yum-utils zip unzip git initscripts systemd \
  && yum-config-manager --enable ol7_addons                \
  && yum install -y oraclelinux-developer-release-el7      \
  && yum-config-manager --enable ol7_developer             \
- && yum install -y R                                      \
+ && yum install -y R python3                              \
  && mkdir -p /opt/install                                 
 
 COPY oracle-instantclient* /opt/install/
