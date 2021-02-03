@@ -18,16 +18,24 @@ RUN yum install -y yum-utils zip unzip git bzip2 initscripts systemd sudo wget &
     yum install -y oraclelinux-developer-release-el7                      && \
     yum install -y oracle-epel-release-el7                                && \
     yum-config-manager --enable ol7_developer                             && \
-    yum groupinstall "X Window System"                                    && \
-    yum install -y R python3 libaio make libcurl-devel openssl-devel xml2 libxml2-devel libgit2-devel cairo-devel && \
-	yum -y localinstall $INSTALL_DIR/jdk-8u241-linux-x64.rpm              && \
+    yum groupinstall "X Window System"
+    
+# Install required packages including oracle client 
+RUN yum install -y R python3 python3-devel libaio make libcurl-devel openssl-devel xml2 libxml2-devel libgit2-devel cairo-devel && \
+    yum -y localinstall $INSTALL_DIR/jdk-8u241-linux-x64.rpm              && \
     cd $ORACLE_HOME                                                       && \
     unzip instantclient-basic-linux.x64-21.1.0.0.0.zip                    && \
     unzip instantclient-sqlplus-linux.x64-21.1.0.0.0.zip                  && \ 
-    cd $INSTALL_DIR && \
-    unzip ore-client-linux-x86-64-1.5.1.zip && \
-    unzip ore-supporting-linux-x86-64-1.5.1.zip && \
-    R -e "install.packages('devtools', repos = 'http://cran.us.r-project.org')" && \
+    cd $INSTALL_DIR                                                       && \
+    unzip ore-client-linux-x86-64-1.5.1.zip                               && \
+    unzip ore-supporting-linux-x86-64-1.5.1.zip                          
+    
+# Upgrade pip and install packages for jupyter
+RUN  python3 -m pip install --upgrade pip                                 && \
+     python3 -m pip install jupyter grpcio protobuf                          
+
+# Install R packages for zeppelin and ORE
+RUN R -e "install.packages('devtools', repos = 'http://cran.us.r-project.org')" && \
     R -e "install.packages('knitr', repos = 'http://cran.us.r-project.org')" && \
     R -e "install.packages('ggplot2', repos = 'http://cran.us.r-project.org')" && \
     R -e "install.packages(c('devtools','mplot', 'googleVis'), repos = 'http://cran.us.r-project.org'); require(devtools); install_github('ramnathv/rCharts')" && \    
@@ -55,6 +63,7 @@ RUN yum install -y yum-utils zip unzip git bzip2 initscripts systemd sudo wget &
 ENV JAVA_HOME=/usr/java/jdk1.8.0_241-amd64 \
     JRE_HOME=/usr/java/jdk1.8.0_241-amd64/jre    
     
+# Install Zeppelin from binary
 RUN wget http://www-us.apache.org/dist/zeppelin/zeppelin-0.9.0/zeppelin-0.9.0-bin-all.tgz && \
     tar -xvf zeppelin-*-bin-all.tgz -C /opt && \
     mv /opt/zeppelin-*-bin-all /opt/zeppelin    

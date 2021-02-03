@@ -839,7 +839,7 @@
         },
         "zeppelin.python": {
           "name": "zeppelin.python",
-          "value": "python",
+          "value": "python3",
           "type": "string",
           "description": "Python directory. It is set to python by default.(assume python is in your $PATH)"
         },
