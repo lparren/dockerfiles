@@ -13,6 +13,10 @@ echo "**************************************************************************
 echo "Install R packages for zeppelin and ORE" `date`
 echo "******************************************************************************"
 
+cd $INSTALL_DIR        
+unzip ore-client-linux-x86-64-1.5.1.zip
+unzip ore-supporting-linux-x86-64-1.5.1.zip
+ 
 R -e "install.packages('devtools', repos = 'http://cran.us.r-project.org')" 
 R -e "install.packages('knitr', repos = 'http://cran.us.r-project.org')" 
 R -e "install.packages('ggplot2', repos = 'http://cran.us.r-project.org')" 

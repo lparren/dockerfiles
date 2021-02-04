@@ -15,4 +15,4 @@ echo "**************************************************************************
 
 # Upgrade pip and install packages for jupyter
 python3 -m pip install --upgrade pip
-python3 -m pip install jupyter grpcio protobuf matplotlib
+python3 -m pip install wheel jupyter grpcio protobuf matplotlib Pandas Seaborn Plotnine Bokeh Holoviews Altair 

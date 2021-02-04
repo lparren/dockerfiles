@@ -5,25 +5,23 @@ ENV RUN_FILE="init.sh"  \
     ORACLE_HOME=/opt/oracle \
     SETUP_R="setup_r.sh" \
     SETUP_PYTHON="setup_python.sh" \
-    SETUP_ZEPPELIN="setup_zeppelin.sh"
+    SETUP_ZEPPELIN="setup_zeppelin.sh" \
+    ZEPPELIN_SRC="zeppelin-0.9.0-bin-all.tgz"
         
 ENV PATH="$PATH:$ORACLE_HOME/instantclient_21_1" \
     LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ORACLE_HOME/instantclient_21_1"
     
 ENV PATH=$PATH:$ORACLE_HOME/bin
 
-COPY jdk-8u241-linux-x64.rpm ore-supporting-linux-x86-64-1.5.1.zip ore-client-linux-x86-64-1.5.1.zip interpreter.json log4j.properties $RUN_FILE $SETUP_R $SETUP_PYTHON $SETUP_ZEPPELIN $INSTALL_DIR/
+COPY jdk-8u241-linux-x64.rpm ore-supporting-linux-x86-64-1.5.1.zip ore-client-linux-x86-64-1.5.1.zip interpreter.json log4j.properties $RUN_FILE $SETUP_R $SETUP_PYTHON $SETUP_ZEPPELIN $ZEPPELIN_SRC $INSTALL_DIR/
 COPY instantclient*.zip  $ORACLE_HOME/
 
 RUN chmod +x $INSTALL_DIR/$RUN_FILE
 
 RUN yum install -y yum-utils zip unzip git bzip2 initscripts systemd sudo wget && \
-    yum-config-manager --enable ol7_optional_latest                       && \
-    yum-config-manager --enable ol7_addons                                && \
     yum install -y oraclelinux-developer-release-el7                      && \
     yum install -y oracle-epel-release-el7                                && \
-    yum-config-manager --enable ol7_developer                             && \
-    yum groupinstall -y "X Window System"                                 
+    yum-config-manager --enable ol7_optional_latest ol7_addons ol7_developer                              
     
 # Install required packages including oracle client 
 RUN yum install -y R python3 python3-devel libaio make libcurl-devel openssl-devel xml2 libxml2-devel libgit2-devel cairo-devel    && \
@@ -43,4 +41,4 @@ ENV ZEPPELIN_ADDR=0.0.0.0
 EXPOSE 8080
 
 #CMD $INSTALL_DIR/$RUN_FILE
-sleep infinity
+CMD sleep infinity

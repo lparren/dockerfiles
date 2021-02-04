@@ -13,9 +13,5 @@ echo "**************************************************************************
 echo "Install Zeppelin from binary" `date`
 echo "******************************************************************************"
 
-wget http://www-us.apache.org/dist/zeppelin/zeppelin-0.9.0/zeppelin-0.9.0-bin-all.tgz 
-tar -xvf zeppelin-*-bin-all.tgz -C /opt 
+tar -xvf $INSTALL_DIR/zeppelin-*-bin-all.tgz -C /opt 
 mv /opt/zeppelin-*-bin-all /opt/zeppelin    
-
-
-
