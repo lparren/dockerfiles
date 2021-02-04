@@ -24,14 +24,20 @@ if [ "$ORACLE_PASSWORD" == "" ]; then
   exit 1;
 fi
 
-CONTAINER_ALREADY_STARTED="CONTAINER_ALREADY_STARTED_PLACEHOLDER"
+CONTAINER_ALREADY_STARTED="$$INSTALL_DIR/CONTAINER_ALREADY_STARTED_PLACEHOLDER"
 if [ ! -e $CONTAINER_ALREADY_STARTED ]; then
     touch $CONTAINER_ALREADY_STARTED
     echo "-- First container startup --"
+    
+    yum install -y R python3 python3-devel libaio make libcurl-devel openssl-devel xml2 libxml2-devel libgit2-devel cairo-devel    
 
-    sed -i -e "s|###ORACLE_CONNECT###|$ORACLE_CONNECT|g" /zeppelin/conf/interpreter.json
-    sed -i -e "s|###ORACLE_USER###|$ORACLE_USER|g" /zeppelin/conf/interpreter.json
-    sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" /zeppelin/conf/interpreter.json
+    /vagrant/scripts/setup_r.sh
+    /vagrant/scripts/setup_python.sh
+    /vagrant/scripts/setup_zeppelin.sh      
 fi
+
+echo "******************************************************************************"
+echo "Start Zeppelin" `date`
+echo "******************************************************************************"
 
 /opt/zeppelin/bin/zeppelin.sh
