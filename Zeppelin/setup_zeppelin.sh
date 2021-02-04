@@ -17,9 +17,5 @@ wget http://www-us.apache.org/dist/zeppelin/zeppelin-0.9.0/zeppelin-0.9.0-bin-al
 tar -xvf zeppelin-*-bin-all.tgz -C /opt 
 mv /opt/zeppelin-*-bin-all /opt/zeppelin    
 
-sed -i -e "s|###ORACLE_CONNECT###|$ORACLE_CONNECT|g" $INSTALL_DIR/interpreter.json
-sed -i -e "s|###ORACLE_USER###|$ORACLE_USER|g" $INSTALL_DIR/interpreter.json
-sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" $INSTALL_DIR/interpreter.json
 
-cp $INSTALL_DIR/interpreter.json /opt/zeppelin/conf/
 

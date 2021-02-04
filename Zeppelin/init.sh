@@ -27,13 +27,13 @@ fi
 CONTAINER_ALREADY_STARTED="$$INSTALL_DIR/CONTAINER_ALREADY_STARTED_PLACEHOLDER"
 if [ ! -e $CONTAINER_ALREADY_STARTED ]; then
     touch $CONTAINER_ALREADY_STARTED
-    echo "-- First container startup --"
+    echo "-- First container startup --"   
     
-    yum install -y R python3 python3-devel libaio make libcurl-devel openssl-devel xml2 libxml2-devel libgit2-devel cairo-devel    
+    sed -i -e "s|###ORACLE_CONNECT###|$ORACLE_CONNECT|g" $INSTALL_DIR/interpreter.json
+    sed -i -e "s|###ORACLE_USER###|$ORACLE_USER|g" $INSTALL_DIR/interpreter.json
+    sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" $INSTALL_DIR/interpreter.json
 
-    /vagrant/scripts/setup_r.sh
-    /vagrant/scripts/setup_python.sh
-    /vagrant/scripts/setup_zeppelin.sh      
+    cp $INSTALL_DIR/interpreter.json /opt/zeppelin/conf/    
 fi
 
 echo "******************************************************************************"

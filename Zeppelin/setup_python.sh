@@ -15,4 +15,4 @@ echo "**************************************************************************
 
 # Upgrade pip and install packages for jupyter
 python3 -m pip install --upgrade pip
-python3 -m pip install jupyter grpcio protobuf                          
+python3 -m pip install jupyter grpcio protobuf matplotlib
