@@ -12,7 +12,7 @@ ENV PATH="$PATH:$ORACLE_HOME/instantclient_21_1" \
     
 ENV PATH=$PATH:$ORACLE_HOME/bin
 
-COPY jdk-8u241-linux-x64.rpm ore-supporting-linux-x86-64-1.5.1.zip ore-client-linux-x86-64-1.5.1.zip interpreter.json log4j.properties $RUN_FILE $INSTALL_DIR/
+COPY jdk-8u241-linux-x64.rpm ore-supporting-linux-x86-64-1.5.1.zip ore-client-linux-x86-64-1.5.1.zip interpreter.json log4j.properties $RUN_FILE $SETUP_R $SETUP_PYTHON $SETUP_ZEPPELIN $INSTALL_DIR/
 COPY instantclient*.zip  $ORACLE_HOME/
 
 RUN chmod +x $INSTALL_DIR/$RUN_FILE
