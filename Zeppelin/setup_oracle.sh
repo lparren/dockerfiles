@@ -10,10 +10,10 @@
 #
 
 echo "******************************************************************************"
-echo "Install python pageges and upgrade pip" `date`
+echo "Install Oracle client" `date`
 echo "******************************************************************************"
 
-# Upgrade pip and install packages for jupyter
-python3 -m pip install --upgrade pip
-python3 -m pip install wheel 
-python3 -m pip install jupyter grpcio protobuf matplotlib Pandas Seaborn Plotnine Bokeh Holoviews Altair tensorflow keras freeze bkzep
+unzip $ORACLE_HOME/instantclient-basic-linux.x64-21.1.0.0.0.zip -d $ORACLE_HOME
+unzip $ORACLE_HOME/instantclient-sqlplus-linux.x64-21.1.0.0.0.zip -d $ORACLE_HOME
+
+rm instantclient-*-linux.x64-21.1.0.0.0.zip

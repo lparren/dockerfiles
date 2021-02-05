@@ -30,8 +30,13 @@ if [ ! -e $INSTALL_DIR/$CONTAINER_ALREADY_STARTED ]; then
     touch $INSTALL_DIR/$CONTAINER_ALREADY_STARTED
     echo "-- First container startup --"   
     
+    # Switch all to python3
+    sed -i -e "s|\"value\": \"python\"|\"value\": \"python3\"|g" $INSTALL_DIR/interpreter.json
+    
+    # Set osql parameters    
     sed -i -e "s|###ORACLE_CONNECT###|$ORACLE_CONNECT|g" $INSTALL_DIR/interpreter.json
     sed -i -e "s|###ORACLE_USER###|$ORACLE_USER|g" $INSTALL_DIR/interpreter.json
+    sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" $INSTALL_DIR/interpreter.json
     sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" $INSTALL_DIR/interpreter.json
 
     chmod 775 $INSTALL_DIR/interpreter.json

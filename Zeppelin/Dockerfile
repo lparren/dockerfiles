@@ -16,12 +16,11 @@ ENV PATH=$PATH:$ORACLE_HOME/bin
 COPY jdk-8u241-linux-x64.rpm ore-supporting-linux-x86-64-1.5.1.zip ore-client-linux-x86-64-1.5.1.zip interpreter.json log4j.properties $RUN_FILE $SETUP_R $SETUP_PYTHON $SETUP_ZEPPELIN $ZEPPELIN_SRC $INSTALL_DIR/
 COPY instantclient*.zip  $ORACLE_HOME/
 
-RUN chmod +x $INSTALL_DIR/$RUN_FILE
-
 RUN yum install -y yum-utils zip unzip git bzip2 initscripts systemd sudo wget && \
     yum install -y oraclelinux-developer-release-el7                      && \
     yum install -y oracle-epel-release-el7                                && \
-    yum-config-manager --enable ol7_optional_latest ol7_addons ol7_developer                              
+    yum-config-manager --enable ol7_optional_latest ol7_addons ol7_developer && \
+    yum groupinstall "X Window System"
     
 # Install required packages including oracle client 
 RUN yum install -y R python3 python3-devel libaio make libcurl-devel openssl-devel xml2 libxml2-devel libgit2-devel cairo-devel    && \
@@ -29,6 +28,7 @@ RUN yum install -y R python3 python3-devel libaio make libcurl-devel openssl-dev
 
 #RUN chmod ug+x $INSTALL_DIR/*.sh && \
 #    sync && \
+#    $INSTALL_DIR/$SETUP_ORACLE && \
 #    $INSTALL_DIR/$SETUP_R && \
 #    $INSTALL_DIR/$SETUP_PYTHON && \
 #    $INSTALL_DIR/$SETUP_ZEPPELIN 

@@ -22,6 +22,7 @@ R -e "install.packages('knitr', repos = 'http://cran.us.r-project.org')"
 R -e "install.packages('ggplot2', repos = 'http://cran.us.r-project.org')" 
 R -e "install.packages(c('devtools','mplot', 'googleVis'), repos = 'http://cran.us.r-project.org'); require(devtools); install_github('ramnathv/rCharts')"    
 R -e "update.packages(ask = FALSE, repos = 'http://cran.us.r-project.org')" 
+
 R CMD INSTALL $INSTALL_DIR/client/ORE_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz               
 R CMD INSTALL $INSTALL_DIR/client/OREbase_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz           
 R CMD INSTALL $INSTALL_DIR/client/OREcommon_1.5.1_R_x86_64-unknown-linux-gnu.tar.gz         
@@ -42,3 +43,6 @@ R CMD INSTALL $INSTALL_DIR/supporting/png_0.1-7_R_x86_64-unknown-linux-gnu.tar.g
 R CMD INSTALL $INSTALL_DIR/supporting/randomForest_4.6-12_R_x86_64-unknown-linux-gnu.tar.gz 
 R CMD INSTALL $INSTALL_DIR/supporting/statmod_1.4.29_R_x86_64-unknown-linux-gnu.tar.gz      
 
+R -e "install.packages('shiny', repos = 'http://cran.us.r-project.org')" 
+R -e "install.packages('IRkernel', repos = 'http://cran.us.r-project.org')" 
+R -e "IRkernel::installspec(user = FALSE, sys_prefix = TRUE)" 

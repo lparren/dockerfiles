@@ -29,9 +29,15 @@ if [ ! -e $CONTAINER_ALREADY_STARTED ]; then
     touch $CONTAINER_ALREADY_STARTED
     echo "-- First container startup --"
 
-    sed -i -e "s|###ORACLE_CONNECT###|$ORACLE_CONNECT|g" /zeppelin/conf/interpreter.json
-    sed -i -e "s|###ORACLE_USER###|$ORACLE_USER|g" /zeppelin/conf/interpreter.json
-    sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" /zeppelin/conf/interpreter.json
+    # Switch all to python3
+    sed -i -e "s|\"python\"|\"python3\"|g" $INSTALL_DIR/interpreter.json
+    
+    # Set osql parameters
+    sed -i -e "s|###ORACLE_CONNECT###|$ORACLE_CONNECT|g" $INSTALL_DIR/interpreter.json
+    sed -i -e "s|###ORACLE_USER###|$ORACLE_USER|g" $INSTALL_DIR/interpreter.json
+    sed -i -e "s|###ORACLE_PASSWORD###|$ORACLE_PASSWORD|g" $INSTALL_DIR/interpreter.json
+    
+    mv $INSTALL_DIR/interpreter.json /opt/zeppelin/conf/
 fi
 
-/zeppelin/bin/zeppelin.sh
+/opt/zeppelin/bin/zeppelin.sh
