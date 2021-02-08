@@ -16,4 +16,4 @@ echo "**************************************************************************
 unzip $ORACLE_HOME/instantclient-basic-linux.x64-21.1.0.0.0.zip -d $ORACLE_HOME
 unzip $ORACLE_HOME/instantclient-sqlplus-linux.x64-21.1.0.0.0.zip -d $ORACLE_HOME
 
-rm instantclient-*-linux.x64-21.1.0.0.0.zip
+rm $ORACLE_HOME/instantclient-*-linux.x64-21.1.0.0.0.zip

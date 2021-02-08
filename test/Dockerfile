@@ -1,3 +1,12 @@
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 FROM oraclelinux:7-slim as base
 
 ENV Z_VERSION="0.9.0"
@@ -27,6 +36,8 @@ RUN echo "$LOG_TAG install basic packages" && \
 ARG miniconda_version="py37_4.9.2"
 # Hashes via https://docs.conda.io/en/latest/miniconda_hashes.html
 ARG miniconda_sha256="79510c6e7bd9e012856e25dcb21b3e093aa4ac8113d9aa7e82a86987eabe1c31"
+# Install python and R packages via conda
+COPY env_python_3_with_R.yml $INSTALL_DIR/
 
 RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-${miniconda_version}-Linux-x86_64.sh -O miniconda.sh && \
     echo "${miniconda_sha256} miniconda.sh" > anaconda.sha256 && \
@@ -40,9 +51,10 @@ ENV PATH $A_HOME/conda/bin:$PATH
     
 RUN conda install -c conda-forge pycodestyle numpy=1 pandas=0.25 scipy=1 grpcio hvplot protobuf=3 pandasql=0.7.3 ipython=7 matplotlib=3 ipykernel=5 && \
     conda install -c conda-forge jupyter_client=5 bokeh=1.3.4 panel holoviews pyyaml=3 altair intake plotnine seaborn pip && \
-    conda install -c r r-base=3 r-evaluate r-base64enc r-knitr r-ggplot2 r-irkernel r-shiny r-googlevis r-essentials r-base r-rlang && \
+    conda install -c r r-base=3 r-evaluate r-base64enc r-knitr r-ggplot2 r-irkernel r-shiny r-googlevis r-essentials r-base && \
     conda env export -n base --no-builds > environment.yml && \  
-    conda init bash 
+    conda init bash && \
+    conda activate base
     
 RUN # Cleanup
     rm -v miniconda.sh anaconda.sha256  && \
