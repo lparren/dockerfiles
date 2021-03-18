@@ -39,6 +39,8 @@ To run your OAS Docker image use the **docker run** command as follows:
              --stop-timeout 600 \
              -e "BI_CONFIG_RCU_DBSTRING=192.168.120.80:1521:orclpdb1" \
              -e "BI_CONFIG_RCU_PWD=Admin123" \
+             -e "WAIT_FOR_HOST=192.168.120.80" \
+             -e "WAIT_FOR_PORT=1521" \             
              oracle/oas:5.5.0
   
   Parameters:

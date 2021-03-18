@@ -1,0 +1,33 @@
+FROM oraclelinux:7-slim as base
+
+ENV INSTALL_DIR=/opt/install \
+    A_HOME="/root"
+
+RUN yum install -y yum-utils zip unzip git bzip2 initscripts systemd sudo wget && \
+    yum install -y oraclelinux-developer-release-el7                      && \
+    yum install -y oracle-epel-release-el7                                && \
+    yum-config-manager --enable ol7_optional_latest ol7_addons ol7_developer && \
+    yum -y update
+    
+# Install conda to manage python and R packages
+ARG miniconda_version="py38_4.9.2"
+
+RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-${miniconda_version}-Linux-x86_64.sh -O miniconda.sh && \
+    bash miniconda.sh -b -p $A_HOME/conda && \
+    export PATH=$A_HOME/conda/bin:$PATH && \
+    conda config --set always_yes yes --set changeps1 no && \
+    conda info -a
+    
+ENV PATH $A_HOME/conda/bin:$PATH   
+    
+RUN conda env export -n base --no-builds > environment.yml && \  
+    conda init bash 
+    
+RUN rm -v miniconda.sh && \
+    conda clean -ay
+    # Allow to modify conda packages. This allows malicious code to be injected into other interpreter sessions, therefore it is disabled by default
+    # chmod -R ug+rwX $A_HOME/conda
+
+RUN pip install dbt==0.19.0
+    
+CMD sleep infinity

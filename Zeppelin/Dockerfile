@@ -12,7 +12,7 @@ ENV LOG_TAG="[ZEPPELIN_${Z_VERSION}]:" \
     ZEPPELIN_ADDR="0.0.0.0" \
     A_HOME="/root"
 
-COPY jdk-8u241-linux-x64.rpm  $INSTALL_DIR/
+COPY jdk-8u241-linux-x64.rpm  zeppelin-${Z_VERSION}-bin-all.tgz $INSTALL_DIR/
 
 RUN echo "$LOG_TAG install basic packages" && \
     yum install -y yum-utils zip unzip git bzip2 initscripts systemd sudo wget && \
@@ -39,25 +39,24 @@ RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-${miniconda_version}
 ENV PATH $A_HOME/conda/bin:$PATH   
     
 RUN conda install -c conda-forge pycodestyle numpy=1 pandas=0.25 scipy=1 grpcio hvplot protobuf=3 pandasql=0.7.3 ipython=7 matplotlib=3 ipykernel=5 && \
-    conda install -c conda-forge jupyter_client=5 bokeh=1.3.4 panel holoviews pyyaml=3 altair intake plotnine seaborn pip && \
+    conda install -c conda-forge jupyter_client=5 bokeh=1.3.4 panel holoviews pyyaml=3 altair intake plotnine seaborn pip tensorflow keras&& \
     conda install -c r r-base=3 r-evaluate r-base64enc r-knitr r-ggplot2 r-irkernel r-shiny r-googlevis r-essentials r-base r-rlang && \
     conda env export -n base --no-builds > environment.yml && \  
-    conda init bash 
+    conda init bash && \
+    pip install bkzep
     
-RUN # Cleanup
-    rm -v miniconda.sh anaconda.sha256  && \
-    # Cleanup based on https://github.com/ContinuumIO/docker-images/commit/cac3352bf21a26fa0b97925b578fb24a0fe8c383
-    find $A_HOME/conda/ -follow -type f -name '*.a' -delete && \
-    find $A_HOME/conda/ -follow -type f -name '*.js.map' -delete && \
-    conda clean -ay
-    # Allow to modify conda packages. This allows malicious code to be injected into other interpreter sessions, therefore it is disabled by default
-    # chmod -R ug+rwX $A_HOME/conda
+    
+#RUN rm -v miniconda.sh anaconda.sha256  && \
+#    # Cleanup based on https://github.com/ContinuumIO/docker-images/commit/cac3352bf21a26fa0b97925b578fb24a0fe8c383
+#    find $A_HOME/conda/ -follow -type f -name '*.a' -delete && \
+#    find $A_HOME/conda/ -follow -type f -name '*.js.map' -delete && \
+#    conda clean -ay
+#    # Allow to modify conda packages. This allows malicious code to be injected into other interpreter sessions, therefore it is disabled by default
+#    # chmod -R ug+rwX $A_HOME/conda
     
 RUN echo "$LOG_TAG Download Zeppelin binary" && \
     mkdir -p ${Z_HOME} && \
-    wget -nv -O /tmp/zeppelin-${Z_VERSION}-bin-all.tgz https://archive.apache.org/dist/zeppelin/zeppelin-${Z_VERSION}/zeppelin-${Z_VERSION}-bin-all.tgz && \
-    tar --strip-components=1 -zxvf  /tmp/zeppelin-${Z_VERSION}-bin-all.tgz -C ${Z_HOME} && \
-    rm -f /tmp/zeppelin-${Z_VERSION}-bin-all.tgz && \
+    tar --strip-components=1 -zxvf  $INSTALL_DIR/zeppelin-${Z_VERSION}-bin-all.tgz -C ${Z_HOME} && \
     chown -R root:root ${Z_HOME} && \
     mkdir -p ${Z_HOME}/logs ${Z_HOME}/run ${Z_HOME}/webapps && \
     # Allow process to edit /etc/passwd, to create a user entry for zeppelin

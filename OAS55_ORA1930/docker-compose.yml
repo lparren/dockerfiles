@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  ora:
+    image: oracle/database:19.3.0-ee
+    container_name: ora1930
+    environment:
+      - ORACLE_SID=db1930 
+      - ORACLE_PDB=pdb1930 
+      - ORACLE_PWD=oracle 
+    volumes:
+      - ./ora1930_oradata/:/opt/oracle/oradata/
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    networks:
+      - oracle_network
+#  oas:
+#    image: oracle/oas:5.5.0
+#    container_name: oas55
+#    environment:
+#      - BI_CONFIG_RCU_DBSTRING=ora1930:1521:pdb1930
+#      - BI_CONFIG_RCU_PWD=oracle
+#    ports:
+#      - "9500-9514:9500-9514"
+#    depends_on:
+#      - ora
+#    networks:
+#      - oracle_network
+networks:
+  oracle_network:
+    driver: bridge
