@@ -4,12 +4,12 @@
 #
 # OAS DOCKERFILES PROJECT
 # --------------------------
-# This is the Dockerfile for Oracle Analytics Server 5.5.0
+# This is the Dockerfile for Oracle Analytics Server 5.9.0
 # 
 # REQUIRED FILES TO BUILD THIS IMAGE
 # ----------------------------------
 # (1) V988574-01.zip
-#     Download Oracle Analytics Server 5.5.0 For Linux x86-64, 3.5 GB
+#     Download Oracle Analytics Server 5.9.0 For Linux x86-64, 3.5 GB
 #     from https://edelivery.oracle.com/
 # (2) V983368-01.zip
 #     Download Oracle Fusion Middleware 12c (12.2.1.4.0) Infrastructure, 1.5 GB
@@ -22,7 +22,7 @@
 # -----------------------
 # Put all downloaded files in the same directory as this Dockerfile
 # Run: 
-#      $ docker build -t oracle/oas:5.5.0 . 
+#      $ docker build -t oracle/oas:5.9.0 . 
 
 
 # Pull base image
@@ -35,11 +35,11 @@ LABEL maintainer="Gianni Ceresa <gianni.ceresa@datalysis.ch>"
 
 # Environment variables required for this build (do NOT change)
 # -------------------------------------------------------------
-ENV OAS_VERSION="5.5.0"                         \
+ENV OAS_VERSION="5.9.0"                         \
     ORACLE_BASE=/opt/oracle                     \
-    INSTALL_FILE_JDK="jdk-8u241-linux-x64.rpm"  \
-    INSTALL_FILE_WLS="V983368-01.zip"           \
-    INSTALL_FILE_OAS="V988574-01.zip"           \
+    INSTALL_FILE_JDK="jdk-8u281-linux-x64.rpm"  \
+    INSTALL_FILE_WLS="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"           \
+    INSTALL_FILE_OAS="Oracle_Analytics_Server_Linux_5.9.0.zip"           \
     INSTALL_RSP_WLS="weblogic.rsp"              \
     INSTALL_RSP_OAS="oas_install.rsp"           \
     CONFIG_RSP_OAS="oas_config.rsp"             \
@@ -64,7 +64,7 @@ COPY ${INSTALL_RSP_WLS} ${INSTALL_RSP_OAS} ${CONFIG_RSP_OAS} ${RUN_FILE} ${ENTRY
 RUN useradd -d /home/oracle -m -s /bin/bash oracle                               && \
     echo oracle:oracle | chpasswd                                                && \
     yum -y update                                                                && \
-    yum -y install oracle-rdbms-server-12cR1-preinstall unzip wget tar openssl   && \
+    yum -y install oracle-database-preinstall-19c.x86_64 unzip wget tar openssl  && \
     yum -y localinstall ${INSTALL_DIR}/${INSTALL_FILE_JDK}                       && \
     yum clean all                                                                && \
     rm ${INSTALL_DIR}/${INSTALL_FILE_JDK}                                        && \
@@ -95,13 +95,14 @@ USER oracle
 RUN cd ${INSTALL_DIR}                       && \
     unzip ${INSTALL_FILE_WLS} -d ./tmp_wls  && \
     rm ${INSTALL_FILE_WLS}                  && \
-    java -jar $(find ${INSTALL_DIR}/tmp_wls -name *.jar) -silent -responseFile ${ORACLE_BASE}/${INSTALL_RSP_WLS} -invPtrLoc ${ORACLE_BASE}/oraInst.loc  && \
-    rm -rf ${INSTALL_DIR}/tmp_wls           && \
-    unzip ${INSTALL_FILE_OAS} -d ./tmp_oas  && \
-    rm ${INSTALL_FILE_OAS}                  && \
-    java -jar $(find ${INSTALL_DIR}/tmp_oas -name *.jar) -silent -responseFile ${ORACLE_BASE}/${INSTALL_RSP_OAS} -invPtrLoc ${ORACLE_BASE}/oraInst.loc  && \
-    rm -rf ${INSTALL_DIR}/tmp_oas           && \
-    rm -rf ${INSTALL_DIR}
+    java -jar $(find ${INSTALL_DIR}/tmp_wls -name *.jar) -silent -responseFile ${ORACLE_BASE}/${INSTALL_RSP_WLS} -invPtrLoc ${ORACLE_BASE}/oraInst.loc 
+#    && \
+#    rm -rf ${INSTALL_DIR}/tmp_wls           && \
+#    unzip ${INSTALL_FILE_OAS} -d ./tmp_oas  && \
+#    rm ${INSTALL_FILE_OAS}                  && \
+#    java -jar $(find ${INSTALL_DIR}/tmp_oas -name *.jar) -silent -responseFile ${ORACLE_BASE}/${INSTALL_RSP_OAS} -invPtrLoc ${ORACLE_BASE}/oraInst.loc  && \
+#    rm -rf ${INSTALL_DIR}/tmp_oas           && \
+#    rm -rf ${INSTALL_DIR}
 
 # Set work directory
 # ------------------
@@ -114,4 +115,5 @@ EXPOSE 9500-9514
 # Define default command to start OAS
 # -----------------------------------
 #ENTRYPOINT ["${ORACLE_BASE}/docker-entrypoint.sh"]
-CMD [${ORACLE_BASE}/${RUN_FILE}]
+#CMD [${ORACLE_BASE}/${RUN_FILE}]
+CMD sleep infinity
