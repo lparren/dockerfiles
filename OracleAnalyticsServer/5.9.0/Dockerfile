@@ -40,11 +40,11 @@ ENV OAS_VERSION="5.9.0"                         \
     INSTALL_FILE_JDK="jdk-8u281-linux-x64.rpm"  \
     INSTALL_FILE_WLS="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"           \
     INSTALL_FILE_OAS="Oracle_Analytics_Server_Linux_5.9.0.zip"           \
+    INSTALL_FILE_PATCH="p30657796_122140_Generic.zip" \
     INSTALL_RSP_WLS="weblogic.rsp"              \
     INSTALL_RSP_OAS="oas_install.rsp"           \
     CONFIG_RSP_OAS="oas_config.rsp"             \
-    RUN_FILE="runOAS.sh"                        \
-    ENTRYPOINT="docker-entrypoint.sh"
+    RUN_FILE="runOAS.sh"
     
 # Use second ENV so that variables get substituted
 ENV INSTALL_DIR=${ORACLE_BASE}/install                 \
@@ -53,8 +53,8 @@ ENV INSTALL_DIR=${ORACLE_BASE}/install                 \
 
 # Copy binaries
 # -------------
-COPY ${INSTALL_FILE_JDK} ${INSTALL_FILE_WLS} ${INSTALL_FILE_OAS} ${INSTALL_DIR}/
-COPY ${INSTALL_RSP_WLS} ${INSTALL_RSP_OAS} ${CONFIG_RSP_OAS} ${RUN_FILE} ${ENTRYPOINT} _configureOAS.sh _validateRCU.sh _dropRCU.sh ${ORACLE_BASE}/
+COPY ${INSTALL_FILE_JDK} ${INSTALL_FILE_WLS} ${INSTALL_FILE_OAS} ${INSTALL_FILE_PATCH} ${INSTALL_DIR}/
+COPY ${INSTALL_RSP_WLS} ${INSTALL_RSP_OAS} ${CONFIG_RSP_OAS} ${RUN_FILE} _configureOAS.sh _validateRCU.sh _dropRCU.sh ${ORACLE_BASE}/
 
 # Setup filesystem and 'oracle' user
 # Adjust file permissions, go to 'ORACLE_HOME' as 'oracle' to proceed with OAS installation
@@ -95,14 +95,18 @@ USER oracle
 RUN cd ${INSTALL_DIR}                       && \
     unzip ${INSTALL_FILE_WLS} -d ./tmp_wls  && \
     rm ${INSTALL_FILE_WLS}                  && \
-    java -jar $(find ${INSTALL_DIR}/tmp_wls -name *.jar) -silent -responseFile ${ORACLE_BASE}/${INSTALL_RSP_WLS} -invPtrLoc ${ORACLE_BASE}/oraInst.loc 
-#    && \
-#    rm -rf ${INSTALL_DIR}/tmp_wls           && \
-#    unzip ${INSTALL_FILE_OAS} -d ./tmp_oas  && \
-#    rm ${INSTALL_FILE_OAS}                  && \
-#    java -jar $(find ${INSTALL_DIR}/tmp_oas -name *.jar) -silent -responseFile ${ORACLE_BASE}/${INSTALL_RSP_OAS} -invPtrLoc ${ORACLE_BASE}/oraInst.loc  && \
-#    rm -rf ${INSTALL_DIR}/tmp_oas           && \
-#    rm -rf ${INSTALL_DIR}
+    java -jar $(find ${INSTALL_DIR}/tmp_wls -name *.jar) -silent -responseFile ${ORACLE_BASE}/${INSTALL_RSP_WLS} -invPtrLoc ${ORACLE_BASE}/oraInst.loc && \
+    rm -rf ${INSTALL_DIR}/tmp_wls           && \
+    unzip p30657796_122140_Generic.zip -d ./patch_top && \
+    cd ./patch_top/30657796                 && \
+    $ORACLE_HOME/OPatch/opatch apply -silent && \
+    cd ${INSTALL_DIR}                       && \
+    rm -rf ${INSTALL_DIR}/patch_top         && \
+    unzip ${INSTALL_FILE_OAS} -d ./tmp_oas  && \
+    rm ${INSTALL_FILE_OAS}                  && \
+    java -jar $(find ${INSTALL_DIR}/tmp_oas -name *.jar) -silent -responseFile ${ORACLE_BASE}/${INSTALL_RSP_OAS} -invPtrLoc ${ORACLE_BASE}/oraInst.loc  && \
+    rm -rf ${INSTALL_DIR}/tmp_oas           && \
+    rm -rf ${INSTALL_DIR}
 
 # Set work directory
 # ------------------
@@ -114,6 +118,5 @@ EXPOSE 9500-9514
 
 # Define default command to start OAS
 # -----------------------------------
-#ENTRYPOINT ["${ORACLE_BASE}/docker-entrypoint.sh"]
-#CMD [${ORACLE_BASE}/${RUN_FILE}]
-CMD sleep infinity
+CMD [${ORACLE_BASE}/${RUN_FILE}]
+#CMD sleep infinity
