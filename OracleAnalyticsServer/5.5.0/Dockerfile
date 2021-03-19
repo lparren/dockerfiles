@@ -43,8 +43,7 @@ ENV OAS_VERSION="5.5.0"                         \
     INSTALL_RSP_WLS="weblogic.rsp"              \
     INSTALL_RSP_OAS="oas_install.rsp"           \
     CONFIG_RSP_OAS="oas_config.rsp"             \
-    RUN_FILE="runOAS.sh"                        \
-    ENTRYPOINT="docker-entrypoint.sh"
+    RUN_FILE="runOAS.sh"
     
 # Use second ENV so that variables get substituted
 ENV INSTALL_DIR=${ORACLE_BASE}/install                 \
@@ -54,7 +53,7 @@ ENV INSTALL_DIR=${ORACLE_BASE}/install                 \
 # Copy binaries
 # -------------
 COPY ${INSTALL_FILE_JDK} ${INSTALL_FILE_WLS} ${INSTALL_FILE_OAS} ${INSTALL_DIR}/
-COPY ${INSTALL_RSP_WLS} ${INSTALL_RSP_OAS} ${CONFIG_RSP_OAS} ${RUN_FILE} ${ENTRYPOINT} _configureOAS.sh _validateRCU.sh _dropRCU.sh ${ORACLE_BASE}/
+COPY ${INSTALL_RSP_WLS} ${INSTALL_RSP_OAS} ${CONFIG_RSP_OAS} ${RUN_FILE} _configureOAS.sh _validateRCU.sh _dropRCU.sh ${ORACLE_BASE}/
 
 # Setup filesystem and 'oracle' user
 # Adjust file permissions, go to 'ORACLE_HOME' as 'oracle' to proceed with OAS installation
@@ -113,5 +112,4 @@ EXPOSE 9500-9514
 
 # Define default command to start OAS
 # -----------------------------------
-#ENTRYPOINT ["${ORACLE_BASE}/docker-entrypoint.sh"]
 CMD [${ORACLE_BASE}/${RUN_FILE}]

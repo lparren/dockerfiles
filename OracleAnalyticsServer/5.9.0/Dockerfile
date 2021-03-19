@@ -5,18 +5,6 @@
 # OAS DOCKERFILES PROJECT
 # --------------------------
 # This is the Dockerfile for Oracle Analytics Server 5.9.0
-# 
-# REQUIRED FILES TO BUILD THIS IMAGE
-# ----------------------------------
-# (1) V988574-01.zip
-#     Download Oracle Analytics Server 5.9.0 For Linux x86-64, 3.5 GB
-#     from https://edelivery.oracle.com/
-# (2) V983368-01.zip
-#     Download Oracle Fusion Middleware 12c (12.2.1.4.0) Infrastructure, 1.5 GB
-#     from https://edelivery.oracle.com/
-# (3) jdk-8u241-linux-x64.rpm
-#     Download an Oracle JDK 1.8.211+
-#     from https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 #
 # HOW TO BUILD THIS IMAGE
 # -----------------------
@@ -118,5 +106,4 @@ EXPOSE 9500-9514
 
 # Define default command to start OAS
 # -----------------------------------
-CMD [${ORACLE_BASE}/${RUN_FILE}]
-#CMD sleep infinity
+CMD ${ORACLE_BASE}/${RUN_FILE}
