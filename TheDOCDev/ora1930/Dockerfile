@@ -5,7 +5,7 @@
 # ORACLE DOCKERFILES PROJECT
 # --------------------------
 # This is the Dockerfile for Oracle Database 19c
-# 
+#
 # REQUIRED FILES TO BUILD THIS IMAGE
 # ----------------------------------
 # (1) db_home.zip
@@ -15,8 +15,8 @@
 # HOW TO BUILD THIS IMAGE
 # -----------------------
 # Put all downloaded files in the same directory as this Dockerfile
-# Run: 
-#      $ docker build -t oracle/database:19.3.0-${EDITION} . 
+# Run:
+#      $ docker build -t oracle/database:19.3.0-${EDITION} .
 #
 # Pull base image
 # ---------------
@@ -91,6 +91,8 @@ ARG DB_EDITION
 # Copy DB install file
 COPY --chown=oracle:dba $INSTALL_FILE_1 $INSTALL_RSP $INSTALL_DB_BINARIES_FILE $ORE_SERVER $ORE_SUPPORT $INSTALL_DIR/
 
+RUN echo "DB_EDITION = $DB_EDITION"
+
 # Install DB software binaries
 USER oracle
 RUN chmod ug+x $INSTALL_DIR/*.sh && \
@@ -121,5 +123,5 @@ WORKDIR /home/oracle
 HEALTHCHECK --interval=1m --start-period=5m \
    CMD "$ORACLE_BASE/$CHECK_DB_FILE" >/dev/null || exit 1
 
-# Define default command to start Oracle Database. 
+# Define default command to start Oracle Database.
 CMD exec $ORACLE_BASE/$RUN_FILE
